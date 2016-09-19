@@ -1,27 +1,14 @@
-FROM gocd/gocd-agent:16.7.0
+FROM python:2.7.12
 
 WORKDIR /iac
 
-# installpip and ansible deps (devel libraries)
-RUN apt-get update && \
-    apt-get -y install \
-    python-pip \
-    python-yaml \
-    python-jinja2 \
-    python-httplib2 \
-    python-paramiko \
-    python-pkg-resources \
-    python-keyczar \
-    python-setuptools \
-    build-essential
+# useful cache for quick tries when in dev-mode
+RUN apt-get update
 
 # install the heart of this container
 RUN pip install awscli boto ansible
 
-# latest version of ansible ec2 dynamic inventory
-RUN curl -s \
-    -O https://raw.githubusercontent.com/ansible/ansible/devel/contrib/inventory/ec2.py \
-    -O https://raw.githubusercontent.com/ansible/ansible/devel/contrib/inventory/ec2.ini
+WORKDIR /iac
+COPY ./ /iac/
 
-ENTRYPOINT [ "ansible-playbook" ]
-CMD ["-i ec2.py"]
+ENTRYPOINT [ "/bin/bash", "-c" ]

@@ -1,0 +1,86 @@
+---
+- name: Create Filesystem on 2nd Volume
+  filesystem:
+    dev: /dev/xvdf
+    fstype: ext4
+
+- name: Create Go installation folder for mount point
+  file:
+    state: directory
+    path: /var/lib/go-server
+
+- name: Mount 2nd Go Volume
+  mount:
+    name: /var/lib/go-server
+    src: /dev/xvdf
+    fstype: ext4
+    state: mounted
+
+- name: Setting up Go repository
+  copy:
+    src: go-cd.repo
+    dest: /etc/yum.repos.d/go-cd.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Add Go gpg key to rpm database
+  rpm_key:
+    state: present
+    key: https://download.go.cd/GOCD-GPG-KEY.asc
+
+- name: Install Go dependencies
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - unzip
+    - java-1.7.0-openjdk
+    - which
+    - git
+    - nginx
+    - libxml2
+
+- name: Ensure hosts file is accurate
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install go-server
+  yum:
+    name: "go-server-{{ go_version }}"
+    state: present
+  notify:
+    - Restart go-server
+
+- name: Add Go cipher
+  copy:
+    content: "{{ goCipher }}"
+    dest: /etc/go/cipher
+    owner: go
+    group: go
+    mode: 0664
+  notify:
+    - Restart go-server
+
+- name: Set Go Server service config
+  copy:
+    src: go-server
+    dest: /etc/default/go-server
+    owner: go
+    group: go
+    mode: 0644
+  notify:
+    - Restart go-server
+
+- name: Start go-server
+  service:
+    name: go-server
+    state: started
+    enabled: yes
+  notify:
+     - Ensure go-server running
+

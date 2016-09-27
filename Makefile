@@ -24,6 +24,10 @@ login:
 role_credentials: $(HOME)/.aws/credentials
 	./set_role_credentials.sh InfraBuilderAdmin 097214446461 $(oktaname)
 
+destroy: build.toolset
+	@$(DOCKER_RUN) $(dckimage) \
+	"aws cloudformation delete-stack --stack-name gocd-server-rafa --region us-east-1"
+
 # buildpack container shell for build tasks debugging
 docker.shell: role_credentials
 	docker build -t $(dckimage) .

@@ -1,4 +1,10 @@
 ###
+Using this repo:
+
+```
+make login
+make provision
+```
 
 ## Notes
 https://github.com/ansible/ansible/issues/13026

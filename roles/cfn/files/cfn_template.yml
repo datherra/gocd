@@ -1,0 +1,82 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description:
+  GoCD Server
+
+# Parameters:
+
+# Conditions:
+
+Resources:
+  Instance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      IamInstanceProfile:
+        Ref: "InstanceProfile"
+      ImageId: "ami-f581ebe2"
+      InstanceType: "t2.micro"
+      KeyName: "ansible"
+      SecurityGroupIds:
+        - Ref: SshSg
+        - Ref: GocdServerSg
+      SubnetId: "subnet-4d2bc070"
+      Tags:
+        - Key: Name
+          Value: GoCD Server
+        - Key: Environment
+          Value: test
+      Volumes:
+        - Device: "/dev/xvdf"
+          VolumeId:
+            Ref: GocdVol
+
+  InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+        - "ReadOnly"
+
+  SshSg:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Allows TW network SSH"
+      VpcId: "vpc-b2c22cd6"
+      SecurityGroupIngress:
+        - CidrIp: "10.0.0.0/8"
+          FromPort: "22"
+          ToPort: "22"
+          IpProtocol: "tcp"
+
+  GocdServerSg:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Allows TW network SSH"
+      VpcId: "vpc-b2c22cd6"
+      SecurityGroupIngress:
+        - CidrIp: "10.0.0.0/8"
+          FromPort: "8153"
+          ToPort: "8154"
+          IpProtocol: "tcp"
+        - CidrIp: "192.168.100.0/24"
+          FromPort: "8153"
+          ToPort: "8154"
+          IpProtocol: "tcp"
+
+  GocdVol:
+    Type: "AWS::EC2::Volume"
+    Properties:
+      AvailabilityZone: "us-east-1e" # same as instance subnet
+      Encrypted: true
+      Size: 300
+      Tags:
+        - Key: Backup
+          Value: true
+      VolumeType: gp2
+
+Outputs:
+  InstanceId:
+    Description: "Intance ID"
+    Value:
+      Ref: Instance

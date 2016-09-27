@@ -1,0 +1,358 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "StackName": {
+      "Type": "String"
+    },
+
+    "Environment": {
+      "Type": "String"
+    },
+    "AmiId": {
+      "Type": "String"
+    }
+  },
+
+  "Conditions": {
+    "environmentStatus": {
+      "Fn::Equals": [
+        {
+          "Ref": "Environment"
+        },
+        "production"
+      ]
+    }
+  },
+  "Mappings" : {
+    "RegionMap" : {
+      "us-east-1"      :  {
+                            "internetGateway" : "igw-13efcb76",
+                            "vpcId" : "vpc-b2c22cd6",
+                            "cidrBlock" : "10.42.255.0/24",
+                            "availabilityZone": "us-east-1e",
+                            "privateSubnetId": "subnet-4d2bc070",
+                            "virtualGateway": "vgw-d855b7b1",
+                            "amiType": "m3.large"
+                          }
+    }
+  },
+  "Resources": {
+    "gocdInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": { "Ref": "AmiId"},
+        "SubnetId": { "Fn::FindInMap" : [ "RegionMap", { "Ref": "AWS::Region" }, "privateSubnetId"]},
+        "InstanceType": { "Fn::FindInMap" : [ "RegionMap", { "Ref": "AWS::Region" }, "amiType"]},
+        "SecurityGroupIds": [ { "Ref": "gocdSg"} ],
+        "KeyName": "ansible",
+        "IamInstanceProfile": { "Ref": "gocdInstanceProfile" },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash\n",
+                "AWS_FQDN=$(curl -s 169.254.169.254/latest/meta-data/hostname)\n",
+                "AWS_HOSTNAME=$(curl -s 169.254.169.254/latest/meta-data/hostname | cut -d'.' -f1)\n",
+                "AWS_LOCAL_IPV4=$(curl -s 169.254.169.254/latest/meta-data/local-ipv4)\n",
+                "cat << EOF > /etc/hosts\n",
+                "127.0.0.1 localhost localhost.localdomain\n",
+                "$AWS_LOCAL_IPV4 $AWS_HOSTNAME $AWS_FQDN\n",
+                "EOF\n",
+                "cd /opt/SumoCollector/config/creds && rm -f main.properties\n",
+                "service collector restart"
+              ]
+            ]
+          }
+        },
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/xvda",
+            "Ebs": {
+              "VolumeSize": "30",
+              "VolumeType" : "gp2"
+            }
+          }
+        ],
+        "DisableApiTermination": {
+          "Fn::If": [
+            "environmentStatus",
+            "true",
+            "false"
+          ]
+        },
+        "Volumes": [
+          {
+            "Device": "/dev/xvdb",
+            "VolumeId": {
+              "Ref": "gocdVol"
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Go.cd Server"
+          },
+          {
+            "Key": "Environment",
+            "Value": { "Ref": "Environment" }
+          },
+          {
+            "Key": "Backup",
+            "Value": "True"
+          }
+        ]
+      }
+    },
+    "gocdVol": {
+      "Type": "AWS::EC2::Volume",
+      "DeletionPolicy": "Snapshot",
+      "Properties": {
+          "AvailabilityZone": { "Fn::FindInMap" : [ "RegionMap", { "Ref": "AWS::Region" }, "availabilityZone"]},
+          "Size": "300",
+          "VolumeType": "standard",
+          "AutoEnableIO": true,
+          "Tags": [
+            {
+            "Key": "Backup",
+            "Value": "True"
+            }
+          ]
+      }
+    },
+    "gocdInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "gocdRole"
+          }
+        ]
+      }
+    },
+    "gocdSg": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Security Group for GoCD Server",
+        "VpcId": { "Fn::FindInMap" : [ "RegionMap", { "Ref": "AWS::Region" }, "vpcId"]}
+      }
+    },
+    "ingress1": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "10.0.0.0/8"
+      }
+    },
+    "ingress2": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "8154",
+        "ToPort": "8154",
+        "CidrIp": "10.0.0.0/8"
+      }
+    },
+    "ingress11": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "8153",
+        "ToPort": "8153",
+        "CidrIp": "10.0.0.0/8"
+      }
+    },
+
+    "ingress3": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "10.0.0.0/8"
+      }
+    },
+    "ingress4": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "10.0.0.0/8"
+      }
+    },
+    "ingress5": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "192.168.99.0/24"
+      }
+    },
+    "ingress6": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "192.168.99.0/24"
+      }
+    },
+    "ingress7": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "192.168.80.0/24"
+      }
+    },
+    "ingress8": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "192.168.80.0/24"
+      }
+    },
+    "ingress9": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "192.168.85.0/24"
+      }
+    },
+    "ingress10": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "192.168.85.0/24"
+      }
+    },
+    "egress1": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "gocdSg"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "gocdRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement": [ {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [ "ec2.amazonaws.com" ]
+            },
+            "Action": [ "sts:AssumeRole" ]
+          } ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "gocd-policy",
+            "PolicyDocument": {
+              "Version" : "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Deny",
+                  "Action": [
+                    "*"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "gocdTestDNS": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "HostedZoneName": "thoughtworks.net.",
+        "Comment": "DNS name for my instance.",
+        "Name": {
+          "Fn::If": [
+            "environmentStatus",
+            "gocd.thoughtworks.net",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "gocd-",
+                  {
+                    "Ref": "Environment"
+                  },
+                  ".",
+                  "thoughtworks.net"
+                ]
+              ]
+            }
+          ]
+        },
+        "Type": "A",
+        "TTL": "900",
+        "ResourceRecords": [
+          {
+            "Fn::GetAtt": [
+              "gocdInstance",
+              "PrivateIp"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "Description": "GoCd Server Stack"
+}

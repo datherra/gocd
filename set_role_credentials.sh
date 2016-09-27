@@ -25,6 +25,11 @@ AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
 AWS_ACCESS_KEY_ID=${KST[0]}
 AWS_SECRET_ACCESS_KEY=${KST[1]}
 AWS_SESSION_TOKEN=${KST[2]}
+# boto (not 3) used by ansible depends on old vars version
+AWS_ACCESS_KEY=${KST[0]}
+AWS_SECRET_KEY=${KST[1]}
+AWS_SECURITY_TOKEN=${KST[2]}
+AWS_DELEGATION_TOKEN=${KST[2]}
 EOF
 
 # place temp cred in environment for development via Vagrant

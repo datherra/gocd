@@ -16,13 +16,13 @@ login:
     --username $(oktaname) \
     --server thoughtworks.okta.com \
     --apptype amazon_aws \
-    --appid exk12oibpidf0xgvb0i8 | \
+    --appid exk1au43i2tG7m4Nc0h8 \
     aws_role_credentials saml \
     --profile $(AWS_DEFAULT_PROFILE)
 
 # assume role specific ami build role for the sake of standard
 role_credentials: $(HOME)/.aws/credentials
-	./set_role_credentials.sh InfraBuilderAdmin 097214446461 $(oktaname)
+	./set_role_credentials.sh InfraBuilderAdmin 921251377951 $(oktaname)
 
 destroy: build.toolset
 	@$(DOCKER_RUN) $(dckimage) \

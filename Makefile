@@ -16,7 +16,7 @@ login:
     --username $(oktaname) \
     --server thoughtworks.okta.com \
     --apptype amazon_aws \
-    --appid exk1au43i2tG7m4Nc0h8 \
+    --appid exk1au43i2tG7m4Nc0h8 | \
     aws_role_credentials saml \
     --profile $(AWS_DEFAULT_PROFILE)
 

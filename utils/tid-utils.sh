@@ -5,23 +5,22 @@ function tid-dm-create {
   echo -e "Creating docker-host with docker-machine utility...\n"
   echo    "Remember to have valid AWS creds available either"
   echo    "on your session or in $HOME/.aws/credentials."
-  echo -e "ELK VPN connection is required as well.\n"
   docker-machine create \
     --driver amazonec2 \
+    --amazonec2-ami ami-13be557e \
     --amazonec2-region us-east-1 \
-    --amazonec2-vpc-id vpc-b2c22cd6 \
+    --amazonec2-vpc-id vpc-221fae47 \
     --amazonec2-zone e \
-    --amazonec2-subnet-id subnet-4d2bc070 \
-    --amazonec2-private-address-only \
-    --amazonec2-instance-type t2.medium docker-infradel-$(whoami)
+    --amazonec2-subnet-id subnet-4e8eec74 \
+    --amazonec2-instance-type t2.medium docker-devopslabs-$(whoami)
 
   echo -e "\nRunning docker env setup"
-  eval $(docker-machine env docker-$(whoami)) && echo "Ready" || echo "ERROR"
+  eval $(docker-machine env docker-devopslabs-$(whoami)) && echo "Ready" || echo "ERROR"
 }
 
 function tid-dm-destroy {
   echo -e "\nTerminating docker-host with docker-machine utility"
-  docker-machine rm docker-$(whoami)
+  docker-machine rm docker-devopslabs-$(whoami)
 }
 
 # snippet to help w/ multiple aws cli profiles

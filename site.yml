@@ -3,7 +3,7 @@
   connection: local
   gather_facts: false
   roles:
-    - role: cfn
+    - role: aws_infra
 
 - hosts: server
   remote_user: ec2-user

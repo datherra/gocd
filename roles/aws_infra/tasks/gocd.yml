@@ -4,7 +4,7 @@
     stack_name: gocd-server-rafa
     state: present
     region: us-east-1
-    template: roles/cfn/files/cfn_template.yml
+    template: roles/aws_infra/files/cfn_gocd_server.yml
     tags:
       Environment: test
     # template_parameters:

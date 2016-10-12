@@ -650,7 +650,7 @@
           },
           {
             "Ref": "PrivateSubnet2ARouteTable"
-          },
+          }
         ],
         "ServiceName": {
           "Fn::Join": [

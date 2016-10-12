@@ -11,4 +11,4 @@ RUN pip install ansible awscli boto credstash
 WORKDIR /iac
 COPY ./ /iac/
 
-ENTRYPOINT [ "/bin/bash", "-c" ]
+ENTRYPOINT ["scripts/entrypoint.sh"]

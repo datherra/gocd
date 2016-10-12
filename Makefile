@@ -3,10 +3,11 @@ dckimage = buildpack-$(shell basename `git rev-parse --show-toplevel`)
 build.toolset:
 	docker build -t $(dckimage) .
 
-# AMIs creation and query targets
 provision: role_credentials build.toolset
 	docker run --env-file role_credentials --rm -it $(dckimage) \
-    "ansible-playbook -i inventories site.yml"
+   -i inventories site.yml
+	# @$(DOCKER_RUN) $(dckimage) -i inventories site.yml
+	
 
 # AWS access and authorization management
 AWS_DEFAULT_PROFILE ?= sts

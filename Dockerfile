@@ -6,7 +6,7 @@ WORKDIR /iac
 RUN apt-get update
 
 # install the heart of this container
-RUN pip install awscli boto ansible
+RUN pip install ansible awscli boto credstash
 
 WORKDIR /iac
 COPY ./ /iac/

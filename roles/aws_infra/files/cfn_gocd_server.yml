@@ -23,7 +23,7 @@ Resources:
       SubnetId: "subnet-4e8eec74"
       Tags:
         - Key: Name
-          Value: GoCD Server
+          Value: gocd_server
         - Key: Environment
           Value: test
       Volumes:

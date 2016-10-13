@@ -27,6 +27,14 @@ destroy: build.toolset
 	@$(docker_run) --entrypoint /bin/bash $(dckimage) -c \
 	"aws cloudformation delete-stack --stack-name gocd-server-rafa --region us-east-1"
 
+cfn_validate: role_credentials build.toolset
+	# validating roles/aws_infra/files/cfn_vpc.json
+	@$(docker_run) --entrypoint /bin/bash $(dckimage) -c \
+	"aws cloudformation validate-template --template-body '$$(cat roles/aws_infra/files/cfn_vpc.json)'"
+	# validating roles/aws_infra/files/cfn_gocd_server.json
+	@$(docker_run) --entrypoint /bin/bash $(dckimage) -c \
+	"aws cloudformation validate-template --template-body '$$(cat roles/aws_infra/files/cfn_gocd_server.yml)'"
+
 # buildpack container shell for build tasks debugging
 docker.shell: role_credentials
 	@$(docker_run) --entrypoint /bin/bash $(dckimage)

@@ -1,10 +1,23 @@
-###
-Using this repo:
+# Template for AWS Shared Service Account
 
+## Using this repo:
+
+### pre-req
+* Having access to the DevOps Labs AWS account.
+  Get in touch with us via __#slack__ to request access:
+  https://thoughtworks.slack.com/archives/devopslabs
+
+* Python 2.7 and some libraries for authentication tooling
+  ```
+  pip install -r requirements.txt
+  ```
+
+### Provisioning everything 
 ```
 make login
 make provision
 ```
+
 ## Utils
 Sometimes when running `docker build`, you can face problems with bandwith heavy operations like `apt-get update` commands and others.
 To help with that, you can execute your docker containers on a docker host running in AWS, meaning that these operations will then use Amazon's Internet pipes.
@@ -53,3 +66,6 @@ https://github.com/ansible/ansible/issues/13026
 `ec2.py` dynamic inventory is waiting this PR (https://github.com/ansible/ansible/issues/15215) to get sts assume_role feature in it. In this repo, we are already using the version mentioned on the thread
 
 https://github.com/BWITS/ansible/blob/devel/contrib/inventory/ec2.py
+
+## TODO
+[ ] VPC - add bastion host

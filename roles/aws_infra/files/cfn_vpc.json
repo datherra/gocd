@@ -24,23 +24,11 @@
             "PublicSubnet1CIDR",
             "PublicSubnet2CIDR"
           ]
-        },
-        {
-          "Label": {
-            "default": "Amazon EC2 Configuration"
-          },
-          "Parameters": [
-            "KeyPairName",
-            "NATInstanceType"
-          ]
         }
       ],
       "ParameterLabels": {
         "AvailabilityZones": {
           "default": "Availability Zones"
-        },
-        "KeyPairName": {
-          "default": "Key pair name"
         },
         "NumberOfAZs": {
           "default": "Number of Availability Zones"
@@ -67,10 +55,6 @@
     "AvailabilityZones": {
       "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved.",
       "Type": "List<AWS::EC2::AvailabilityZone::Name>"
-    },
-    "KeyPairName": {
-      "Description": "Public/private key pairs allow you to securely connect to your NAT instance after it launches. This is used only if the region does not support NAT gateways.",
-      "Type": "AWS::EC2::KeyPair::KeyName"
     },
     "NumberOfAZs": {
       "AllowedValues": [
@@ -373,32 +357,8 @@
           "Ref": "PrivateSubnet1ARouteTable"
         },
         "DestinationCidrBlock": "0.0.0.0/0",
-        "InstanceId": {
-          "Fn::If": [
-            "NATInstanceCondition",
-            {
-              "Ref": "NATInstance1"
-            },
-            {
-              "Ref": "AWS::NoValue"
-            }
-          ]
-        },
         "NatGatewayId": {
-          "Fn::If": [
-            "NATGatewayCondition",
-            {
-              "Ref": "NATGateway1"
-            },
-            {
-              "Ref": "AWS::NoValue"
-            }
-          ]
-        }
-      },
-      "Metadata": {
-        "AWS::CloudFormation::Designer": {
-          "id": "dc92397a-ed14-456f-bf52-6e3a0598bb28"
+          "Ref": "NATGateway1"
         }
       }
     },
@@ -448,32 +408,8 @@
           "Ref": "PrivateSubnet2ARouteTable"
         },
         "DestinationCidrBlock": "0.0.0.0/0",
-        "InstanceId": {
-          "Fn::If": [
-            "NATInstanceCondition",
-            {
-              "Ref": "NATInstance2"
-            },
-            {
-              "Ref": "AWS::NoValue"
-            }
-          ]
-        },
         "NatGatewayId": {
-          "Fn::If": [
-            "NATGatewayCondition",
-            {
-              "Ref": "NATGateway2"
-            },
-            {
-              "Ref": "AWS::NoValue"
-            }
-          ]
-        }
-      },
-      "Metadata": {
-        "AWS::CloudFormation::Designer": {
-          "id": "2b0d94f9-af6a-48f0-9e77-f0df26fdbf4d"
+          "Ref": "NATGateway2"
         }
       }
     },

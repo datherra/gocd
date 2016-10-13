@@ -1,13 +1,11 @@
+docker_run = docker run --env-file role_credentials --rm -it
 dckimage = buildpack-$(shell basename `git rev-parse --show-toplevel`)
 
 build.toolset:
 	docker build -t $(dckimage) .
 
 provision: role_credentials build.toolset
-	docker run --env-file role_credentials --rm -it $(dckimage) \
-   -i inventories site.yml
-	# @$(DOCKER_RUN) $(dckimage) -i inventories site.yml
-	
+	@$(docker_run) $(dckimage) -i inventories site.yml	
 
 # AWS access and authorization management
 AWS_DEFAULT_PROFILE ?= sts
@@ -26,10 +24,9 @@ role_credentials: $(HOME)/.aws/credentials
 	./set_role_credentials.sh InfraBuilderAdmin 921251377951 $(oktaname)
 
 destroy: build.toolset
-	@$(DOCKER_RUN) $(dckimage) \
+	@$(docker_run) --entrypoint /bin/bash $(dckimage) -c \
 	"aws cloudformation delete-stack --stack-name gocd-server-rafa --region us-east-1"
 
 # buildpack container shell for build tasks debugging
 docker.shell: role_credentials
-	docker build -t $(dckimage) .
-	docker run --env-file role_credentials --rm -it $(dckimage) bash
+	@$(docker_run) --entrypoint /bin/bash $(dckimage)

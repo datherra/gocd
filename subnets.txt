@@ -1,0 +1,28 @@
+TechOps ASWS assigned CIDRs:
+https://thoughtworks.jiveon.com/docs/DOC-33465
+ 10.34.0.0/19 - used in this repo
+ 10.34.32.0/19
+ 10.34.64.0/19
+ 10.34.96.0/19
+10.34.128.0/19
+10.34.160.0/19
+10.34.192.0/19
+10.34.224.0/19
+
+Subnetting:
+10.34.0.0/19 - VPC
+  10.34.0.0/21 - az1
+    10.34.0.0/22 - priv (1024 - 5 = 1019 hosts)*
+    10.34.4.0/22 - pub (1024 - 5 = 1019 hosts)*
+  10.34.8.0/21 - az2
+    10.34.8.0/22 - priv (1024 - 5 = 1019 hosts)*
+    10.34.12.0/22 - pub (1024 - 5 = 1019 hosts)*
+  10.34.16.0/21 - az3 (spare)
+    10.34.16.0/22 - priv
+    10.34.20.0/22 - pub
+  10.34.24.0/21 - az4 (spare)
+    10.34.24.0/22 - priv
+    10.34.282.0/22 - pub
+
+* Note that the IP addresses exclude the five (5) IP addresses from each subnet
+  that are reserved and unavailable for use.

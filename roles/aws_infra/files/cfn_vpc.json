@@ -19,8 +19,8 @@
           },
           "Parameters": [
             "VPCCIDR",
-            "PrivateSubnet1ACIDR",
-            "PrivateSubnet2ACIDR",
+            "PrivateSubnet1CIDR",
+            "PrivateSubnet2CIDR",
             "PublicSubnet1CIDR",
             "PublicSubnet2CIDR"
           ]
@@ -33,11 +33,11 @@
         "NumberOfAZs": {
           "default": "Number of Availability Zones"
         },
-        "PrivateSubnet1ACIDR": {
-          "default": "Private subnet 1A CIDR"
+        "PrivateSubnet1CIDR": {
+          "default": "Private subnet 1 CIDR"
         },
-        "PrivateSubnet2ACIDR": {
-          "default": "Private subnet 2A CIDR"
+        "PrivateSubnet2CIDR": {
+          "default": "Private subnet 2 CIDR"
         },
         "PublicSubnet1CIDR": {
           "default": "Public subnet 1 CIDR"
@@ -66,18 +66,18 @@
       "Description": "Number of Availability Zones to use in the VPC. This must match your selections in the list of Availability Zones parameter.",
       "Type": "String"
     },
-    "PrivateSubnet1ACIDR": {
+    "PrivateSubnet1CIDR": {
       "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
       "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
       "Default": "10.0.0.0/19",
-      "Description": "CIDR block for private subnet 1A located in Availability Zone 1",
+      "Description": "CIDR block for private subnet 1 located in Availability Zone 1",
       "Type": "String"
     },
-    "PrivateSubnet2ACIDR": {
+    "PrivateSubnet2CIDR": {
       "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
       "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
       "Default": "10.0.32.0/19",
-      "Description": "CIDR block for private subnet 2A located in Availability Zone 2",
+      "Description": "CIDR block for private subnet 2 located in Availability Zone 2",
       "Type": "String"
     },
     "PublicSubnet1CIDR": {
@@ -189,14 +189,14 @@
         }
       }
     },
-    "PrivateSubnet1A": {
+    "PrivateSubnet1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "VpcId": {
           "Ref": "VPC"
         },
         "CidrBlock": {
-          "Ref": "PrivateSubnet1ACIDR"
+          "Ref": "PrivateSubnet1CIDR"
         },
         "AvailabilityZone": {
           "Fn::Select": [
@@ -209,7 +209,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Private subnet 1A"
+            "Value": "Private subnet 1"
           },
           {
             "Key": "Network",
@@ -218,14 +218,14 @@
         ]
       }
     },
-    "PrivateSubnet2A": {
+    "PrivateSubnet2": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "VpcId": {
           "Ref": "VPC"
         },
         "CidrBlock": {
-          "Ref": "PrivateSubnet2ACIDR"
+          "Ref": "PrivateSubnet2CIDR"
         },
         "AvailabilityZone": {
           "Fn::Select": [
@@ -238,7 +238,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Private subnet 2A"
+            "Value": "Private subnet 2"
           },
           {
             "Key": "Network",
@@ -307,7 +307,7 @@
         "MapPublicIpOnLaunch": true
       }
     },
-    "PrivateSubnet1ARouteTable": {
+    "PrivateSubnet1RouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
         "VpcId": {
@@ -316,7 +316,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Private subnet 1A"
+            "Value": "Private subnet 1"
           },
           {
             "Key": "Network",
@@ -325,11 +325,11 @@
         ]
       }
     },
-    "PrivateSubnet1ARoute": {
+    "PrivateSubnet1Route": {
       "Type": "AWS::EC2::Route",
       "Properties": {
         "RouteTableId": {
-          "Ref": "PrivateSubnet1ARouteTable"
+          "Ref": "PrivateSubnet1RouteTable"
         },
         "DestinationCidrBlock": "0.0.0.0/0",
         "NatGatewayId": {
@@ -337,18 +337,18 @@
         }
       }
     },
-    "PrivateSubnet1ARouteTableAssociation": {
+    "PrivateSubnet1RouteTableAssociation": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
         "SubnetId": {
-          "Ref": "PrivateSubnet1A"
+          "Ref": "PrivateSubnet1"
         },
         "RouteTableId": {
-          "Ref": "PrivateSubnet1ARouteTable"
+          "Ref": "PrivateSubnet1RouteTable"
         }
       }
     },
-    "PrivateSubnet2ARouteTable": {
+    "PrivateSubnet2RouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
         "VpcId": {
@@ -357,7 +357,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "Private subnet 2A"
+            "Value": "Private subnet 2"
           },
           {
             "Key": "Network",
@@ -366,11 +366,11 @@
         ]
       }
     },
-    "PrivateSubnet2ARoute": {
+    "PrivateSubnet2Route": {
       "Type": "AWS::EC2::Route",
       "Properties": {
         "RouteTableId": {
-          "Ref": "PrivateSubnet2ARouteTable"
+          "Ref": "PrivateSubnet2RouteTable"
         },
         "DestinationCidrBlock": "0.0.0.0/0",
         "NatGatewayId": {
@@ -378,14 +378,14 @@
         }
       }
     },
-    "PrivateSubnet2ARouteTableAssociation": {
+    "PrivateSubnet2RouteTableAssociation": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
         "SubnetId": {
-          "Ref": "PrivateSubnet2A"
+          "Ref": "PrivateSubnet2"
         },
         "RouteTableId": {
-          "Ref": "PrivateSubnet2ARouteTable"
+          "Ref": "PrivateSubnet2RouteTable"
         }
       }
     },
@@ -502,10 +502,10 @@
         },
         "RouteTableIds": [
           {
-            "Ref": "PrivateSubnet1ARouteTable"
+            "Ref": "PrivateSubnet1RouteTable"
           },
           {
-            "Ref": "PrivateSubnet2ARouteTable"
+            "Ref": "PrivateSubnet2RouteTable"
           }
         ],
         "ServiceName": {
@@ -527,26 +527,26 @@
     }
   },
   "Outputs": {
-    "PrivateSubnet1ACIDR": {
-      "Description": "Private subnet 1A CIDR in Availability Zone 1",
+    "PrivateSubnet1CIDR": {
+      "Description": "Private subnet 1 CIDR in Availability Zone 1",
       "Value": {
-        "Ref": "PrivateSubnet1ACIDR"
+        "Ref": "PrivateSubnet1CIDR"
       }
     },
-    "PrivateSubnet1AID": {
-      "Description": "Private subnet 1A ID in Availability Zone 1",
+    "PrivateSubnet1ID": {
+      "Description": "Private subnet 1 ID in Availability Zone 1",
       "Value": {
-        "Ref": "PrivateSubnet1A"
+        "Ref": "PrivateSubnet1"
       }
     },
-    "PrivateSubnet2ACIDR": {
-      "Description": "Private subnet 2A CIDR in Availability Zone 2",
+    "PrivateSubnet2ID": {
+      "Description": "Private subnet 2 ID in Availability Zone 2",
       "Value": {
-        "Ref": "PrivateSubnet2ACIDR"
+        "Ref": "PrivateSubnet2"
       }
     },
-    "PrivateSubnet2AID": {
-      "Description": "Private subnet 2A ID in Availability Zone 2",
+    "PrivateSubnet2AZ": {
+      "Description": "Private subnet 2 Availability Zone",
       "Value": {
         "Ref": "PrivateSubnet2A"
       }

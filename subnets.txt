@@ -9,7 +9,25 @@ https://thoughtworks.jiveon.com/docs/DOC-33465
 10.34.192.0/19
 10.34.224.0/19
 
-Subnetting:
+## Subnetting:
+# No spare subnets, but separate PROD and UAT VPCs
+10.34.0.0/19
+  10.34.0.0 /20 - VPC prod
+    10.34.0.0/21 - az1
+      10.34.0.0/22 - priv (1024 - 5 = 1019 hosts)*
+      10.34.4.0/22 - pub (1024 - 5 = 1019 hosts)*
+    10.34.8.0/21 - az2
+      10.34.8.0 /22 - priv (1024 - 5 = 1019 hosts)*
+      10.34.12.0/22 - pub (1024 - 5 = 1019 hosts)*
+  10.34.16.0/20 - VPC uat
+    10.34.16.0/21 - az1
+      10.32.16.0/22 - priv (1024 - 5 = 1019 hosts)*
+      10.32.20.0/22 - pub (1024 - 5 = 1019 hosts)*
+    10.34.24.0/21 - az2
+      10.34.24.0/22 - priv (1024 - 5 = 1019 hosts)*
+      10.34.28.0/22 - pub (1024 - 5 = 1019 hosts)*
+
+# Spare subnets, but only one VPC for all environments
 10.34.0.0/19 - VPC
   10.34.0.0/21 - az1
     10.34.0.0/22 - priv (1024 - 5 = 1019 hosts)*
@@ -22,7 +40,7 @@ Subnetting:
     10.34.20.0/22 - pub
   10.34.24.0/21 - az4 (spare)
     10.34.24.0/22 - priv
-    10.34.282.0/22 - pub
+    10.34.28.0/22 - pub
 
 * Note that the IP addresses exclude the five (5) IP addresses from each subnet
   that are reserved and unavailable for use.

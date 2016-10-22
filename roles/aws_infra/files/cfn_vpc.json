@@ -537,18 +537,56 @@
       "Description": "Private subnet 1 ID in Availability Zone 1",
       "Value": {
         "Ref": "PrivateSubnet1"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-${AWS::Region}-SUBNET1ID"
+        }
+      }
+    },
+    "PrivateSubnet1AZ": {
+      "Description": "Private subnet 1 Availability Zone",
+      "Value": {
+        "Fn::GetAtt": [
+          "PrivateSubnet1",
+          "AvailabilityZone"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-${AWS::Region}-SUBNET1AZ"
+        }
+      }
+    },
+    "PrivateSubnet2CIDR": {
+      "Description": "Private subnet 2 CIDR in Availability Zone 2",
+      "Value": {
+        "Ref": "PrivateSubnet2CIDR"
       }
     },
     "PrivateSubnet2ID": {
       "Description": "Private subnet 2 ID in Availability Zone 2",
       "Value": {
         "Ref": "PrivateSubnet2"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-${AWS::Region}-SUBNET2ID"
+        }
       }
     },
     "PrivateSubnet2AZ": {
       "Description": "Private subnet 2 Availability Zone",
       "Value": {
-        "Ref": "PrivateSubnet2A"
+        "Fn::GetAtt": [
+          "PrivateSubnet2",
+          "AvailabilityZone"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-${AWS::Region}-SUBNET2AZ"
+        }
       }
     },
     "PublicSubnet1CIDR": {
@@ -582,10 +620,15 @@
       "Description": "VPC CIDR"
     },
     "VPCID": {
+      "Description": "VPC ID",
       "Value": {
         "Ref": "VPC"
       },
-      "Description": "VPC ID"
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-${AWS::Region}-VPCID"
+        }
+      }
     }
   }
 }

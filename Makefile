@@ -5,7 +5,7 @@ build.toolset:
 	docker build -t $(dckimage) .
 
 provision: role_credentials build.toolset
-	@$(docker_run) $(dckimage) -i inventories site.yml	
+	@$(docker_run) $(dckimage) -i inventories site.yml
 
 # AWS access and authorization management
 AWS_DEFAULT_PROFILE ?= sts
@@ -19,7 +19,8 @@ login:
     aws_role_credentials saml \
     --profile $(AWS_DEFAULT_PROFILE)
 
-# assume role specific ami build role for the sake of standard
+# assume specific build role with access required by this repo
+# (ok, not THAT specific for now)
 role_credentials: $(HOME)/.aws/credentials
 	./set_role_credentials.sh InfraBuilderAdmin 921251377951 $(oktaname)
 

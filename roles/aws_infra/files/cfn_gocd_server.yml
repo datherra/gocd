@@ -81,6 +81,22 @@ Resources:
 
 Outputs:
   InstanceId:
-    Description: Intance ID
+    Description: Instance ID
     Value:
-      Ref: Instance
+      !Ref Instance
+  AvailabilityZone:
+    Description: Datacenter Location
+    Value:
+      !GetAtt Instance.AvailabilityZone
+  PrivateDnsName:
+    Description: Private DNS Name (known in the VPC only)
+    Value:
+      !GetAtt Instance.PrivateDnsName
+  PrivateIp:
+    Description: Internal IP address
+    Value:
+      !GetAtt Instance.PrivateIp
+  Volume:
+    Description: Where gocd stuff is
+    Value:
+      !Ref GocdVol

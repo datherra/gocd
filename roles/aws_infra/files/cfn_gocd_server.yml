@@ -20,7 +20,9 @@ Resources:
       SecurityGroupIds:
         - Ref: SshSg
         - Ref: GocdServerSg
-      SubnetId: "subnet-4e8eec74"
+      SubnetId:
+        Fn::ImportValue:
+          !Sub "vpc-model-01-${AWS::Region}-SUBNET1ID"
       Tags:
         - Key: Name
           Value: gocd_server
@@ -30,30 +32,31 @@ Resources:
         - Device: /dev/xvdf
           VolumeId:
             Ref: GocdVol
-
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
       Roles:
         - ReadOnly
-
   SshSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allows TW network SSH
-      VpcId: vpc-221fae47
+      VpcId:
+        Fn::ImportValue:
+          !Sub "vpc-model-01-${AWS::Region}-VPCID"
       SecurityGroupIngress:
         - CidrIp: 0.0.0.0/0
           FromPort: 22
           ToPort: 22
           IpProtocol: tcp
-
   GocdServerSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allows TW network SSH
-      VpcId: vpc-221fae47
+      VpcId:
+        Fn::ImportValue:
+          !Sub "vpc-model-01-${AWS::Region}-VPCID"
       SecurityGroupIngress:
         - CidrIp: 0.0.0.0/0
           FromPort: 8153
@@ -63,11 +66,12 @@ Resources:
           FromPort: 8153
           ToPort: 8154
           IpProtocol: tcp
-
   GocdVol:
     Type: AWS::EC2::Volume
     Properties:
-      AvailabilityZone: us-east-1e # same as instance subnet
+      AvailabilityZone:
+        Fn::ImportValue:
+          !Sub "vpc-model-01-${AWS::Region}-SUBNET1AZ"
       Encrypted: true
       Size: 300
       Tags:
